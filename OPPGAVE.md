@@ -30,24 +30,19 @@ docker-compose exec postgres psql -U admin -d hobbyhuset -f test-scripts/hobbyhu
 docker-compose exec postgres psql -U admin -d hobbyhuset
 ```
 
-### Kjør automatiske tester
-
-```bash
-docker-compose exec postgres psql -U admin -d hobbyhuset -f test-scripts/test-avansert-sql.sql
-```
 
 ---
 
 ## Besvarelse
 
-- Forklaringer skrives i `besvarelse-avansert-sql.md`
-- SQL-spørringer skrives i `besvarelse.sql`
+- Forklaringer og SQL skrives i `besvarelse-avansert-sql.md`
+
 
 ---
 
 ## Oppgave 1: Window Functions
 
-Window functions utfører beregninger på et sett med rader som er relatert til den nåværende raden, uten å kollapse radene til én (slik `GROUP BY` gjør). De brukes til rangeringer, løpende totaler, og sammenligninger innenfor grupper.
+*Window functions* (vindufunksjoner) utfører beregninger på et sett med rader som er relatert til den nåværende raden, uten å kollapse radene til én (slik `GROUP BY` gjør). De brukes til rangeringer, løpende totaler, og sammenligninger innenfor grupper.
 
 **Generell syntaks:**
 ```sql
@@ -57,7 +52,7 @@ funksjon() OVER (
 )
 ```
 
-**Vanlige window functions:**
+**Vanlige vindufunksjoner:**
 
 | Funksjon | Beskrivelse |
 |----------|-------------|
@@ -67,7 +62,7 @@ funksjon() OVER (
 | `SUM() OVER (...)` | Løpende sum |
 | `AVG() OVER (...)` | Løpende eller partisjonert gjennomsnitt |
 
-### Del 1: Forklar SQL-spørringene (skriv i `besvarelse-avansert-sql.md`)
+### Del 1: Forklar SQL-spørringene (skriv i `besvarelse-avansert-sql-sql.md`)
 
 1.  **Spørring:**
     ```sql
@@ -90,7 +85,7 @@ funksjon() OVER (
     JOIN Kategori K ON V.KatNr = K.KatNr;
     ```
 
-### Del 2: Lag SQL-spørringer (skriv i `besvarelse.sql`)
+### Del 2: Lag SQL-spørringer (skriv i `besvarelse-avansert-sql.sql`)
 
 1.  **Rangering av varer per kategori:** Rangér alle varer etter pris (dyrest først) *innenfor* hver kategori. Resultatet skal vise varenavn, kategori, pris og rang.
 2.  **Løpende sum:** Vis alle ordrer med ordredato og totalbeløp (`SUM(Pris * Antall)` fra `Ordrelinje`), og legg til en kolonne som viser den *løpende summen* av ordrebeløp sortert etter dato.
@@ -130,7 +125,7 @@ WITH RECURSIVE hierarki AS (
 SELECT * FROM hierarki;
 ```
 
-### Del 1: Forklar SQL-spørringen (skriv i `besvarelse-avansert-sql.md`)
+### Del 1: Forklar SQL-spørringen (skriv i `besvarelse-avansert-sql-sql.md`)
 
 1.  **Spørring:**
     ```sql
@@ -146,7 +141,7 @@ SELECT * FROM hierarki;
     ORDER BY KPP.AntallKunder DESC;
     ```
 
-### Del 2: Lag SQL-spørringer (skriv i `besvarelse.sql`)
+### Del 2: Lag SQL-spørringer (skriv i `besvarelse-avansert-sql.sql`)
 
 1.  **Ansatte med over gjennomsnittslønn:** Bruk en CTE til å først beregne gjennomsnittslønnen for alle ansatte, og deretter liste opp alle ansatte som tjener mer enn dette gjennomsnittet. Vis navn, stilling og lønn.
 2.  **Kategorier med flest varer:** Bruk en CTE til å telle antall varer i hver kategori, og deretter finne *kun* kategorien(e) med flest varer. Vis kategorinavn og antall.
@@ -167,7 +162,7 @@ En subquery (underspørring) er en `SELECT`-setning inni en annen SQL-setning. S
 | **I `FROM`** | Brukes som en midlertidig tabell | `FROM (SELECT ...) AS t` |
 | **Med `EXISTS`** | Sjekker om subquery returnerer rader | `WHERE EXISTS (SELECT 1 FROM ...)` |
 
-### Del 1: Forklar SQL-spørringene (skriv i `besvarelse-avansert-sql.md`)
+### Del 1: Forklar SQL-spørringene (skriv i `besvarelse-avansert-sql-sql.md`)
 
 1.  **Spørring (Korrelert subquery):**
     ```sql
@@ -192,7 +187,7 @@ En subquery (underspørring) er en `SELECT`-setning inni en annen SQL-setning. S
     WHERE Gjennomsnittspris > 100;
     ```
 
-### Del 2: Lag SQL-spørringer (skriv i `besvarelse.sql`)
+### Del 2: Lag SQL-spørringer (skriv i `besvarelse-avansert-sql.sql`)
 
 1.  **Kunder som har bestilt en spesifikk vare:** Finn fornavn og etternavn på alle kunder som har bestilt varen med `VNr` = `'10820'`. Bruk en subquery med `IN`.
 2.  **`EXISTS` — Kategorier med dyre varer:** Bruk `EXISTS` for å finne alle kategorier som har minst én vare med en pris over 1000 kr. Vis kategorinavn.
