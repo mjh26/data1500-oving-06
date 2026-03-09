@@ -15,6 +15,7 @@
     ```
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
+Velger alle ansatte, sortert på årslønn (høyest først) og hver ansatt får en rangering basert på lønnen.
 
 2.  **Spørring:**
     ```sql
@@ -28,22 +29,54 @@
     ```
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
+Velger alle varer med kategori og pris, beregner gjennomsnittsprisen for hver kategori og gjennomsnittet på hver red uten å gruppere bort noe.
 
 ### Del 2: Lag SQL-spørringer
 
 1.  **Rangering av varer per kategori:**
     ```sql
     -- Skriv din SQL-spørring her
+    SELECT 
+    V.Betegnelse,
+    K.Navn AS Kategori,
+    V.Pris,
+    RANK() OVER (PARTITION BY K.Navn ORDER BY V.Pris DESC) AS PrisRang
+    FROM Vare V
+    JOIN Kategori K ON V.KatNr = K.KatNr;
     ```
 
 2.  **Løpende sum av ordrebeløp:**
     ```sql
     -- Skriv din SQL-spørring her
+    WITH OrdreTotal AS
+    (SELECT 
+    O.OrdreNr,
+    O.OrdreDato,
+    SUM(OL.prisprenhet * OL.Antall) AS Total
+    FROM Ordre O
+    JOIN Ordrelinje OL ON O.OrdreNr = OL.OrdreNr
+    GROUP BY O.OrdreNr, O.OrdreDato)
+    SELECT 
+    OrdreNr,
+    OrdreDato,
+    Total, 
+    SUM(Total) OVER (ORDER BY OrdreDato) AS LøpendeSum
+    FROM OrdreTotal
+    ORDER BY OrdreDato;
     ```
 
 3.  **Prosentandel av kategoriprisen:**
     ```sql
     -- Skriv din SQL-spørring her
+    SELECT
+    V.Betegnelse,
+    K.Navn AS Kategori,
+    V.Pris,
+    ROUND(V.Pris * 100.0 / SUM(V.Pris) OVER (PARTITION BY K.Navn),
+    2)
+    AS ProsentAvKategori
+    FROM Vare V
+    JOIN Kategori K ON V.KatNr = K.KatNr;
     ```
 
 ---
