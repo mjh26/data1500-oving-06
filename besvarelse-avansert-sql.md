@@ -169,6 +169,8 @@ og kun viser poststedene som har mer enn 5 kunder. Og sorteres synkende etter an
     ```
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
+Underspørringen refererer til rader i den ytre spørringen. For hver vare beregnes gjennomsnittsprisen for samme kategori,
+og hovedspørringen viser kun varer som er dyrere enn gjennomsnittet i sin kategori. 
 
 2.  **Spørring (Subquery i `FROM`):**
     ```sql
@@ -183,20 +185,42 @@ og kun viser poststedene som har mer enn 5 kunder. Og sorteres synkende etter an
     ```
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
+Bruker subquery i FROM som en midlertidig tabell. Den indre spørringen beregner gjennomsnittsprisen for hver kategori.
+Den ytre spørringen filtrerer deretter bort kategorier der gjennomsnittsprisen er under 100 kr. 
 
 ### Del 2: Lag SQL-spørringer
 
 1.  **Kunder som har bestilt en spesifikk vare:**
     ```sql
     -- Skriv din SQL-spørring her
+    SELECT Fornavn, Etternavn
+    FROM Kunde
+    WHERE KNr IN
+    (SELECT KNr
+    FROM Ordre
+    JOIN Ordrelinje ON Ordre.OrdreNr = Ordrelinje.OrdreNr
+    WHERE VNr = '10820');
     ```
 
 2.  **`EXISTS` - Kategorier med dyre varer:**
     ```sql
     -- Skriv din SQL-spørring her
+    SELECT K.Navn AS Kategori
+    FROM Kategori K
+    WHERE EXISTS(
+    SELECT 1
+    FROM Vare V
+    WHERE V.KatNr = K.KatNr
+    AND V.Pris > 1000);
     ```
 
 3.  **Varer dyrere enn gjennomsnittet:**
     ```sql
     -- Skriv din SQL-spørring her
+    SELECT Betegnelse, Pris
+    FROM Vare
+    WHERE Pris > (
+    SELECT AVG(Pris)
+    FROM Vare)
+    ORDER BY Pris DESC;
     ```
