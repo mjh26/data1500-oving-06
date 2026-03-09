@@ -16,6 +16,7 @@
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
 Velger alle ansatte, sortert på årslønn (høyest først) og hver ansatt får en rangering basert på lønnen.
+Ansatt med lik lønn får samme rangering, og neste rangering hopper over ett tall.
 
 2.  **Spørring:**
     ```sql
@@ -29,7 +30,7 @@ Velger alle ansatte, sortert på årslønn (høyest først) og hver ansatt får 
     ```
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
-Velger alle varer med kategori og pris, beregner gjennomsnittsprisen for hver kategori og gjennomsnittet på hver red uten å gruppere bort noe.
+Velger alle varer med kategori og pris, beregner gjennomsnittsprisen for hver kategori og gjennomsnittet på hver rad uten å gruppere bort noe.
 
 ### Del 2: Lag SQL-spørringer
 
@@ -100,22 +101,54 @@ Velger alle varer med kategori og pris, beregner gjennomsnittsprisen for hver ka
     ```
     **Forklaring:**
     *   *... Skriv din forklaring her ...*
+KunderPerPoststed beregner hvor mange kunder som finnes i hvert potnummer. Også henter den poststedsnavn fra Poststed-tabellen,
+og kun viser poststedene som har mer enn 5 kunder. Og sorteres synkende etter antall kunder. 
 
 ### Del 2: Lag SQL-spørringer
 
 1.  **Ansatte med over gjennomsnittslønn:**
     ```sql
     -- Skriv din SQL-spørring her
+    WITH Gjennomsnittslønn AS 
+    (SELECT AVG(Årslønn) AS Snitt
+    FROM Ansatt)
+    SELECT Fornavn, Etternavn, Stilling, Årslønn
+    FROM Ansatt, Gjennomsnittslønn
+    WHERE Årslønn > Snitt;
     ```
 
 2.  **Kategorier med flest varer:**
     ```sql
     -- Skriv din SQL-spørring her
+    WITH AntallVarer AS
+    (SELECT K.KatNr, K.Navn AS Kategori,
+    COUNT(*) AS Antall
+    FROM Vare V
+    JOIN Kategori K ON V.KatNr = K.KatNr
+    GROUP BY K.KatNr, K.Navn),
+    MaksAntall AS
+    (SELECT MAX(Antall) AS MaxAntall
+    FROM AntallVarer)
+    SELECT Kategori, Antall
+    FROM AntallVarer
+    JOIN MaksAntall ON AntallVarer.Antall = MaksAntall.MaxAntall;
     ```
 
 3.  **Rekursiv CTE - Hierarki av ansatte:**
     ```sql
     -- Skriv din SQL-spørring her (inkluder gjerne ALTER TABLE og testdata)
+    WITH RECURSIVE Hierarki AS
+    (SELECT AnsNr, Fornavn, Etternavn, LederAnsNr, 0 AS NIVA
+    FROM Ansatt
+    WHERE AnsNr = 1
+    UNION ALL
+    SELECT A.AnsNr, A.Fornavn, A.Etternavn, A.LederAnsNr,
+    H.Niva + 1
+    FROM Ansatt A
+    JOIN Hierarki H ON A.LederAnsNr = H.AnsNr)
+    SELECT * 
+    FROM Hierarki
+    ORDER BY Niva, AnsNr;
     ```
 
 ---
