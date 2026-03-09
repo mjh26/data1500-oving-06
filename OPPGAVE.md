@@ -201,4 +201,18 @@ En subquery (underspørring) er en `SELECT`-setning inni en annen SQL-setning. S
 
 ```sql
 -- Hint: Bruk RANK() OVER (PARTITION BY ... ORDER BY ...) og filtrer på rang <= 3
+WITH SalgPerVare AS 
+(SELECT V.VNr, V.Betegnelse, V.KatNr,
+        SUM(O.Antall * V.Pris) AS TotaltSalg
+        FROM Ordrelinje O
+        JOIN Vare V ON O.VNr = V.VNr
+        GROUP BY V.VNr, V.Betegnelse, V.KatNr),
+Rangert AS
+(SELECT S.*, RANK() OVER (PARTITION BY S.KatNr
+ORDER BY S.TotaltSalg DESC) AS RANG
+FROM SalgPerVare S)
+SELECT Betegnelse, KatNr, TotaltSalg, Rang
+FROM Rangert
+WHERE Rang <= 3
+ORDER BY KatNr, Rang;
 ```
