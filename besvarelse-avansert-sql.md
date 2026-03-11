@@ -49,21 +49,13 @@ Velger alle varer med kategori og pris, beregner gjennomsnittsprisen for hver ka
 2.  **Løpende sum av ordrebeløp:**
     ```sql
     -- Skriv din SQL-spørring her
-    WITH OrdreTotal AS
-    (SELECT 
-    O.OrdreNr,
-    O.OrdreDato,
-    SUM(OL.prisprenhet * OL.Antall) AS Total
+    SELECT O.OrdreNr, O.OrdreDato,
+    SUM(OL.prisprenhet * OL.Antall) AS Total,
+    SUM (SUM(OL.prisprenhet * OL.Antall)) OVER (ORDER BY O.OrdreDato) AS LøpendeSum
     FROM Ordre O
     JOIN Ordrelinje OL ON O.OrdreNr = OL.OrdreNr
-    GROUP BY O.OrdreNr, O.OrdreDato)
-    SELECT 
-    OrdreNr,
-    OrdreDato,
-    Total, 
-    SUM(Total) OVER (ORDER BY OrdreDato) AS LøpendeSum
-    FROM OrdreTotal
-    ORDER BY OrdreDato;
+    GROUP BY O.OrdreNr, O.OrdreDato
+    ORDER BY O.OrdreDato;
     ```
 
 3.  **Prosentandel av kategoriprisen:**
